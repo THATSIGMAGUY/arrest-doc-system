@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<title>แบบ ม.23 / ปท.1 - Prototype</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600;700&display=swap');
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    font-family: 'Sarabun', 'TH SarabunPSK', sans-serif;
+    font-size: 14px;
+    line-height: 1.6;
+    color: #111;
+    background: #e0e0e0;
+  }
+  .page {
+    width: 210mm;
+    min-height: 297mm;
+    margin: 20px auto;
+    padding: 12mm 15mm 10mm 15mm;
+    background: #fff;
+    box-shadow: 0 2px 8px rgba(0,0,0,.15);
+    page-break-after: always;
+  }
+  .page:last-child { page-break-after: auto; }
+  @media print {
+    body { background: #fff; }
+    .page { margin:0; padding: 10mm 12mm 8mm 12mm; box-shadow:none; width:100%; }
+    @page { margin: 0; size: A4; }
+  }
+
+  /* Header */
+  .page-header {
+    text-align: right;
+    font-size: 13px;
+    margin-bottom: 4px;
+  }
+  h1 {
+    font-size: 15px;
+    font-weight: 700;
+    text-align: center;
+    margin-bottom: 2px;
+    line-height: 1.4;
+  }
+  h1 small { font-size: 13px; font-weight: 400; display: block; }
+
+  /* Main grid table */
+  .form-grid {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 6px;
+    table-layout: fixed;
+  }
+  .form-grid td {
+    border: 1px solid #333;
+    padding: 6px 8px;
+    vertical-align: top;
+    width: 50%;
+    font-size: 13.5px;
+    line-height: 1.55;
+  }
+  .form-grid .section-title {
+    font-weight: 700;
+    margin-bottom: 3px;
+  }
+  .form-grid .section-num {
+    font-weight: 700;
+    display: inline;
+  }
+
+  /* Dotted fields */
+  .d {
+    border-bottom: 1px dotted #555;
+    min-width: 60px;
+    display: inline-block;
+    padding: 0 3px;
+    text-align: center;
+    color: #0000cc;
+    font-weight: 600;
+    font-size: 13.5px;
+  }
+  .d:empty::after { content: '\00a0'; }
+  .d.sm { min-width: 80px; }
+  .d.md { min-width: 120px; }
+  .d.lg { min-width: 180px; }
+  .d.xl { min-width: 260px; }
+  .d.full { min-width: calc(100% - 1em); }
+  .blank {
+    width: 100%;
+    border-bottom: 1px dotted #999;
+    height: 1.5em;
+    display: block;
+  }
+
+  /* Checkbox */
+  .cb {
+    display: inline-block;
+    width: 14px; height: 14px;
+    border: 1px solid #333;
+    vertical-align: middle;
+    margin-right: 4px;
+    text-align: center;
+    font-size: 11px;
+    line-height: 14px;
+  }
+  .cb.checked::after { content: '\2713'; font-weight: 700; }
+
+  /* Signature area */
+  .sig-row {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 18px;
+    padding: 0 10px;
+  }
+  .sig-box {
+    text-align: center;
+    width: 30%;
+    font-size: 13px;
+  }
+  .sig-box .sig-line {
+    width: 100%;
+    border-bottom: 1px dotted #555;
+    height: 30px;
+    display: block;
+    margin-bottom: 2px;
+  }
+
+  /* Page 2 */
+  .page2-title {
+    text-align: center;
+    font-size: 16px;
+    font-weight: 700;
+    margin: 8px 0 10px;
+  }
+  .note {
+    margin-top: 16px;
+    font-size: 12.5px;
+    border-top: 1px solid #999;
+    padding-top: 6px;
+    line-height: 1.5;
+  }
+  .note strong { font-weight: 700; }
+  .val { color: #0000cc; font-weight: 600; }
+
+  /* Large photo grid for ปท.1 หน้าที่ ๒ */
+  .photo-grid-large {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr 1fr;
+    gap: 6px;
+    width: 100%;
+    max-width: 165mm;
+    height: 165mm;
+    margin: 10px auto;
+  }
+  .photo-grid-large .photo-cell {
+    border: 1px solid #333;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    background: #f5f5f5;
+    color: #777;
+    font-size: 13px;
+  }
+  .photo-grid-large .photo-cell .label {
+    font-weight: 700;
+    color: #333;
+    font-size: 15px;
+    margin-bottom: 4px;
+  }
+
+  /* Attachment-style signature boxes (3 in a row, bordered) */
+  .attach-sig-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 8px;
+    margin-top: 8px;
+  }
+  .attach-sig-box {
+    border: 1px solid #555;
+    padding: 6px 8px;
+    text-align: center;
+    font-size: 12.5px;
+    min-height: 70px;
+  }
+  .attach-sig-box .sig-line {
+    display: inline-block;
+    width: 70%;
+    border-bottom: 1px dotted #555;
+    margin: 4px 0 2px;
+    height: 18px;
+  }
+</style>
+</head>
+<body>
+
+<!-- =============== PAGE 1 =============== -->
+<div class="page">
+  <div class="page-header">ปท. ๑ หน้าที่ ๑</div>
+  <h1>
+    แบบบันทึกข้อมูลเกี่ยวกับผู้ถูกควบคุมตัวตามมาตรา ๒๓ แห่งพระราชบัญญัติป้องกัน<br>
+    และปราบปรามการทรมานและการกระทำให้บุคคลสูญหาย พ.ศ. ๒๕๖๕
+  </h1>
+
+  <table class="form-grid">
+    <!-- Row 1: ข้อ 1 + ข้อ 3 -->
+    <tr>
+      <td>
+        <div><span class="section-num">๑</span> ข้อมูลอัตลักษณ์เกี่ยวกับผู้ถูกควบคุมตัว</div>
+        <div style="margin-top:4px">
+          ชื่อ<span class="d md">ทดสอบ</span>นามสกุล<span class="d md">ตัวอย่าง</span><br>
+          เลขบัตรประชาชน<span class="d lg">1-1234-56789-01-2</span><br>
+          หนังสือเดินทาง<span class="d lg">-</span><br>
+          ที่อยู่<span class="d xl">123 หมู่ 4 ถ.สุขุมวิท</span><br>
+          <span class="d full">แขวงบางจาก เขตพระโขนง กรุงเทพฯ</span><br>
+          <span class="blank"></span>
+          หรือตำหนิรูปพรรณที่เห็นเด่นชัด(สามารถเห็นได้ด้วยตาเปล่า)<br>
+          <span class="d full">รอยสักลายมังกรที่แขนซ้าย</span><br>
+          <span class="blank"></span>
+          รูปถ่ายของผู้ถูกควบคุม(ปรากฏตามที่แนบท้ายบันทึก หน้าที่ ๒)
+        </div>
+      </td>
+      <td>
+        <div><span class="section-num">๓</span> คำสั่งที่ให้มีการควบคุมตัว และเหตุแห่งการออกคำสั่งนั้น</div>
+        <div style="margin-top:6px">
+          <span class="cb checked"></span> ความผิดซึ่งหน้าฐาน<span class="d lg">ลักทรัพย์</span><br>
+          <span class="d full">ตาม ป.อาญา มาตรา 334</span><br><br>
+
+          <span class="cb"></span> ตามหมายจับเลขที่ <span class="d lg"></span><br>
+          ศาลผู้ออกหมาย<span class="d lg"></span><br><br>
+
+          <span class="cb"></span> ตามคำสั่ง<span class="d lg"></span><br>
+          เหตุแห่งการออกคำสั่ง<span class="d lg"></span><br><br>
+
+          <span class="cb"></span> กรณีอื่น ๆ ที่มีกฎหมายกำหนดให้อำนาจ<span class="d md"></span><br>
+          <span class="blank"></span>
+        </div>
+      </td>
+    </tr>
+
+    <!-- Row 2: ข้อ 2 + ข้อ 4 -->
+    <tr>
+      <td>
+        <div><span class="section-num">๒</span> ข้อมูลเกี่ยวกับวันเวลา สถานที่ควบคุมตัว และเจ้าหน้าที่ผู้ควบคุมตัว</div>
+        <div style="margin-top:4px">
+          วันที่ถูกควบคุมตัว<span class="d md">6 เม.ย. 69</span>เวลา<span class="d sm">14.30</span>น.<br>
+          สถานที่ที่ถูกควบคุมตัว<span class="d lg">บริเวณหน้าร้านสะดวกซื้อ</span><br>
+          ตำบล/แขวง<span class="d sm">บางจาก</span>อำเภอ/เขต<span class="d sm">พระโขนง</span><br>
+          จังหวัด<span class="d md">กรุงเทพมหานคร</span><br><br>
+
+          <u>เจ้าหน้าที่ผู้ทำการควบคุมตัว</u><br>
+          ชื่อ<span class="d sm">สมชาย</span>นามสกุล<span class="d sm">รักษาดี</span><br>
+          ตำแหน่ง<span class="d lg">รอง สว.(สอบสวน) สน.พระโขนง</span><br>
+          หมายเลขติดต่อ<span class="d md">02-311-xxxx</span><br><br>
+
+          <u>สถานที่ปลายทางที่รับตัว (กรณีที่มีการย้ายสถานที่)</u><br>
+          ชื่อสถานที่ปลายทาง<span class="d lg">สน.พระโขนง</span><br>
+          ตำบล/แขวง<span class="d sm">บางจาก</span>อำเภอ/เขต<span class="d sm">พระโขนง</span><br>
+          จังหวัด<span class="d md">กรุงเทพมหานคร</span><br><br>
+
+          <u>เจ้าหน้าที่ผู้รับผิดชอบการย้ายตัว</u><br>
+          ชื่อ<span class="d sm">สมชาย</span>นามสกุล<span class="d sm">รักษาดี</span><br>
+          ตำแหน่ง<span class="d lg">รอง สว.(สอบสวน) สน.พระโขนง</span><br>
+          หมายเลขติดต่อ<span class="d md">02-311-xxxx</span>
+        </div>
+      </td>
+      <td>
+        <div><span class="section-num">๔</span> เจ้าหน้าที่ของรัฐผู้ออกคำสั่งให้ควบคุมตัว</div>
+        <div style="margin-top:4px">
+          ชื่อ<span class="d sm">สมชาย</span>นามสกุล<span class="d sm">รักษาดี</span><br>
+          ตำแหน่ง<span class="d lg">รอง สว.(สอบสวน) สน.พระโขนง</span>
+        </div>
+
+        <div style="margin-top:18px">
+          <span class="section-num">๕</span> วัน/เวลา/สถานที่ของการปล่อยตัวผู้ถูกควบคุมตัว และผู้มารับตัวผู้ถูกควบคุมตัว/หรือส่งมอบตัว
+        </div>
+        <div style="margin-top:4px">
+          วันที่<span class="d md"></span>เวลา<span class="d sm"></span><br>
+          สถานที่ปล่อยตัว/หรือมอบตัว<span class="d lg"></span><br>
+          <span class="blank"></span>
+          ผู้มารับตัว/รับมอบตัว(มี/ไม่มี)<br>
+          ชื่อ<span class="d sm"></span>นามสกุล<span class="d sm"></span><br>
+          หมายเลขติดต่อ<span class="d md"></span>
+        </div>
+
+        <div style="margin-top:18px">
+          <span class="section-num">๖</span> ข้อมูลเกี่ยวกับสภาพร่างกายและจิตใจของผู้ถูกควบคุมตัว (สามารถเห็นได้ด้วยตาเปล่า)
+        </div>
+        <div style="margin-top:4px">
+          ก่อนถูกควบคุมตัว <span class="d lg">ปกติ ไม่มีบาดแผล</span><br>
+          <span class="blank"></span>
+          ก่อนปล่อยตัวหรือส่งตัวให้พนักงานสอบสวน<br>
+          <span class="d full"></span><br>
+          <span class="blank"></span>
+          ในกรณีที่ผู้ถูกควบคุมตัวถึงแก่ความตายระหว่างการควบคุมตัว สาเหตุแห่งการตาย(เท่าที่ทราบเบื้องต้น)<span class="d md">-</span><br>
+          <span class="blank"></span>
+          สถานที่เก็บศพ<span class="d lg">-</span>
+        </div>
+      </td>
+    </tr>
+
+    <!-- Row 3: ข้อ 7 spanning full or split -->
+    <tr>
+      <td colspan="2">
+        <div><span class="section-num">๗</span> ข้อมูลอื่น ๆ ที่คณะกรรมการกำหนด</div>
+        <div style="margin-top:4px">
+          <span class="d full">-</span><br>
+          <span class="blank"></span>
+          <span class="blank"></span>
+        </div>
+      </td>
+    </tr>
+  </table>
+
+  <!-- Signatures -->
+  <div class="sig-row">
+    <div class="sig-box">
+      <span class="sig-line"></span>
+      ลงชื่อ<br>
+      (..........................................)<br>
+      ตำแหน่ง/ผู้ทำบันทึกควบคุม
+    </div>
+    <div class="sig-box">
+      <span class="sig-line"></span>
+      ลงชื่อ<br>
+      (..........................................)<br>
+      ผู้ถูกควบคุม
+    </div>
+    <div class="sig-box">
+      <span class="sig-line"></span>
+      ลงชื่อ<br>
+      (..........................................)<br>
+      พยาน(ถ้ามี)
+    </div>
+  </div>
+</div>
+
+<!-- =============== PAGE 2 =============== -->
+<div class="page">
+  <div class="page-header">
+    ปท.๑ หน้าที่ ๒<br>
+    <span style="font-size:12px">มีหน้าต่อเป็นบันทึกแนบท้ายเพิ่มเติม</span>
+  </div>
+
+  <div class="page2-title">บันทึกแนบท้ายเพิ่มเติม</div>
+
+  <div class="section" style="margin-bottom:6px">
+    <span class="section-num">๘.</span> เหตุสุดวิสัยที่ไม่สามารถบันทึกภาพและเสียงตามมาตรา ๒๒ วรรคหนึ่งได้ <span class="d lg">ไม่มี</span>
+  </div>
+
+  <div class="section" style="margin-bottom:4px">
+    <span class="section-num">๙.</span> บันทึกอื่น ๆ เพิ่มเติม (ถ้ามี) <span class="d lg">-</span>
+  </div>
+
+  <!-- 4-photo grid (large) -->
+  <div class="photo-grid-large">
+    <div class="photo-cell"><span class="label">หน้าตรง</span>[ภาพถ่ายเต็มตัว]</div>
+    <div class="photo-cell"><span class="label">หันหลัง</span>[ภาพถ่ายเต็มตัว]</div>
+    <div class="photo-cell"><span class="label">หันข้างซ้าย</span>[ภาพถ่ายเต็มตัว]</div>
+    <div class="photo-cell"><span class="label">หันข้างขวา</span>[ภาพถ่ายเต็มตัว]</div>
+  </div>
+
+  <!-- Signatures (bordered boxes) -->
+  <div class="attach-sig-row">
+    <div class="attach-sig-box">
+      ลงชื่อ ร.ต.ต. <span class="sig-line"></span><br>
+      ( <span class="d md">จิรชัยยชญ์ ศรีดวงแก้ว</span> )<br>
+      <span style="font-size:11px">รอง สว.(สส) กก.สส.บก.ตม.๓</span>
+    </div>
+    <div class="attach-sig-box">
+      ลงชื่อ <span class="sig-line"></span><br>
+      ( <span class="d md"></span> )<br>
+      ผู้ถูกควบคุม
+    </div>
+    <div class="attach-sig-box">
+      ลงชื่อ <span class="sig-line"></span><br>
+      ( <span class="d md"></span> )<br>
+      พยาน(ถ้ามี)
+    </div>
+  </div>
+
+  <!-- หมายเหตุ -->
+  <div class="note">
+    <strong>***หมายเหตุ :</strong><br>
+    ๑. ในกรณีข้อมูลตามรายการ ๑ – ๗ มีจำนวนมากให้ทำเป็นบันทึกแนบท้ายเพิ่มเติมในข้อ ๙<br>
+    ๒. ให้เจ้าหน้าที่ของรัฐซึ่งทำการจับและควบคุม ส่งตัวผู้ถูกควบคุมตัวให้กับผู้รับมอบตัว พร้อมสำเนา ปท.๑ และเอกสารประกอบ (ถ้ามี) สำหรับนำบันทึกฉบับจริงเก็บในสารบบของหน่วยงาน<br>
+    ๓. ให้ผู้รับมอบตัวจัดทำ ปท.๑ ในส่วนของตน โดยมีสำเนา ปท.๑ ของผู้ควบคุมคนก่อนเป็นเอกสารแนบท้าย<br>
+    ๔. ภาพถ่ายของผู้ถูกควบคุมตามข้อ ๑ ให้ทำเป็นเอกสารภาพถ่ายแนบท้าย ปท.๑ อย่างน้อยต้องเห็นเนื้อตัวร่างกายตามสภาพภายนอกขณะถูกควบคุมหรือขณะรับมอบตัว โดยไม่ต้องถอดเสื้อผ้า
+  </div>
+</div>
+
+</body>
+</html>

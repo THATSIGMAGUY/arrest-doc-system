@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<title>แบบ ม.22 - Prototype</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600;700&display=swap');
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    font-family: 'Sarabun', 'TH SarabunPSK', sans-serif;
+    font-size: 15px;
+    line-height: 1.7;
+    color: #111;
+    background: #e0e0e0;
+  }
+  .page {
+    width: 210mm;
+    min-height: 297mm;
+    margin: 20px auto;
+    padding: 20mm 22mm 15mm 22mm;
+    background: #fff;
+    box-shadow: 0 2px 8px rgba(0,0,0,.15);
+  }
+  @media print {
+    body { background: #fff; }
+    .page { margin:0; padding: 15mm 18mm 12mm 18mm; box-shadow:none; width:100%; }
+    @page { margin: 0; size: A4; }
+  }
+
+  h1 { font-size: 18px; font-weight: 700; text-align: center; margin-bottom: 2px; }
+  .stars { text-align: center; font-size: 14px; letter-spacing: 1px; margin-bottom: 6px; }
+  .intro { text-indent: 3em; margin-bottom: 10px; }
+
+  .field-line {
+    position: relative;
+    display: inline;
+  }
+  .dotted {
+    border-bottom: 1px dotted #555;
+    min-width: 80px;
+    display: inline-block;
+    padding: 0 4px;
+    text-align: center;
+    color: #0000cc;
+    font-weight: 600;
+  }
+  .dotted:empty::after {
+    content: '\00a0';
+  }
+  .dotted.long { min-width: 200px; }
+  .dotted.xlong { min-width: 320px; }
+  .dotted.full { min-width: calc(100% - 2em); display: inline-block; }
+  .dotted.med { min-width: 140px; }
+
+  .section { margin-bottom: 8px; }
+  .section-num { font-weight: 700; }
+  .blank-line {
+    width: 100%;
+    border-bottom: 1px dotted #999;
+    height: 1.7em;
+    display: block;
+  }
+  .sig-area {
+    margin-top: 30px;
+    text-align: center;
+  }
+  .sig-area .sig-line {
+    display: inline-block;
+    width: 250px;
+    border-bottom: 1px dotted #555;
+    margin-bottom: 2px;
+  }
+  .note {
+    margin-top: 20px;
+    font-size: 13px;
+    border-top: 1px solid #999;
+    padding-top: 6px;
+  }
+  .note strong { font-weight: 700; }
+
+  /* sample data styling */
+  .val { color: #0000cc; font-weight: 600; }
+
+  /* photo grid (4 mugshots in a square) - small version inline */
+  .photo-grid-small {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr 1fr;
+    gap: 3px;
+    width: 180px;
+    height: 180px;
+    margin: 6px auto;
+    border: 1px solid #333;
+    padding: 3px;
+  }
+  .photo-grid-small .photo-cell {
+    border: 1px dashed #888;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f8f8f8;
+    font-size: 11px;
+    color: #555;
+  }
+
+  /* Full attachment page photo grid (2x2 large) */
+  .attach-page {
+    page-break-before: always;
+  }
+  .attach-title {
+    text-align: center;
+    margin-bottom: 8px;
+  }
+  .attach-title .ext { font-size: 16px; font-weight: 700; }
+  .attach-title h2 { font-size: 18px; font-weight: 700; margin-top: 4px; }
+  .attach-title .sub { font-size: 14px; margin-top: 4px; }
+
+  .photo-grid-large {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr 1fr;
+    gap: 6px;
+    width: 100%;
+    height: 195mm;
+    margin: 10px 0;
+  }
+  .photo-grid-large .photo-cell {
+    border: 1px solid #333;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    background: #f5f5f5;
+    color: #777;
+    font-size: 14px;
+  }
+  .photo-grid-large .photo-cell .label {
+    font-weight: 700;
+    color: #333;
+    font-size: 16px;
+    margin-bottom: 4px;
+  }
+
+  /* Signature row (3 boxes) for attachment page */
+  .attach-sig-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 10px;
+    margin-top: 10px;
+  }
+  .attach-sig-box {
+    border: 1px solid #555;
+    padding: 8px 10px;
+    text-align: center;
+    font-size: 13px;
+    min-height: 75px;
+  }
+  .attach-sig-box .sig-line {
+    display: inline-block;
+    width: 70%;
+    border-bottom: 1px dotted #555;
+    margin: 6px 0 2px;
+    height: 20px;
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <h1>แบบแจ้งข้อมูล เรื่อง การจับและควบคุมตามมาตรา ๒๒ วรรคสอง</h1>
+  <div class="stars">******************************************************</div>
+
+  <p class="intro">รายการข้อมูลในการแจ้งการจับและควบคุมไปยังศูนย์รับแจ้งโดยทันทีที่มีข้อมูล ดังต่อไปนี้</p>
+
+  <!-- (1) ข้อมูลผู้ถูกจับ -->
+  <div class="section">
+    <span class="section-num">(๑)</span> ชื่อ/สกุล<span class="dotted long">นายทดสอบ ตัวอย่าง</span>
+    หมายเลขประจำตัวประชาชนหรือ<br>
+    หมายเลขเอกสารอื่นที่ใช้ระบุตัวตน <span class="dotted long">1-1234-56789-01-2</span><br>
+    ที่อยู่ <span class="dotted xlong">123 หมู่ 4 ถ.สุขุมวิท แขวงบางจาก เขตพระโขนง กรุงเทพฯ</span><br>
+    <span class="blank-line"></span>
+    หมายเลขโทรศัพท์<span class="dotted med">081-234-5678</span>
+    และอายุ <span class="dotted">35</span>ปี (โดยประมาณของผู้ถูกจับและควบคุม<br>
+    (หากไม่ทราบให้ระบุว่าไม่ทราบ))
+  </div>
+
+  <!-- (2) วัน เวลา สถานที่ -->
+  <div class="section">
+    <span class="section-num">(๒)</span> วัน เวลา และสถานที่ที่ทำการจับและควบคุม<br>
+    วันที่ <span class="dotted med">6 เมษายน 2569</span>
+    เวลา<span class="dotted">14.30</span>น.
+    สถานที่จับและควบคุม <span class="dotted long">บริเวณหน้าร้านสะดวกซื้อ</span><br>
+    ตำบล/แขวง<span class="dotted med">บางจาก</span>
+    อำเภอ/เขต<span class="dotted med">พระโขนง</span>
+    จังหวัด<span class="dotted med">กรุงเทพมหานคร</span>
+  </div>
+
+  <!-- (3) พฤติการณ์ -->
+  <div class="section">
+    <span class="section-num">(๓)</span> พฤติการณ์ในการจับและควบคุมบุคคลดังกล่าวโดยย่อ<span class="dotted long">เจ้าหน้าที่ตำรวจได้รับแจ้งจากผู้เสียหายว่า</span><br>
+    <span class="dotted" style="width:100%;text-align:left">มีบุคคลลักทรัพย์ภายในร้านสะดวกซื้อ เจ้าหน้าที่จึงเดินทางไปตรวจสอบ พบผู้ต้องหาตามพฤติการณ์</span><br>
+    <span class="dotted" style="width:100%;text-align:left">จึงทำการจับกุมพร้อมของกลาง</span><br>
+    <span class="blank-line"></span>
+    <span class="blank-line"></span>
+    <span class="blank-line"></span>
+    <span class="blank-line"></span>
+  </div>
+
+  <!-- (4) สถานที่ควบคุมตัว -->
+  <div class="section">
+    <span class="section-num">(๔)</span> สถานที่ที่จะนำตัวบุคคลดังกล่าวไปควบคุมไว้<br>
+    สถานที่ควบคุมตัว(สน./สภ./กก.)<span class="dotted long">สน.พระโขนง</span>
+    ตำบล/แขวง<span class="dotted med">บางจาก</span><br>
+    อำเภอ/เขต<span class="dotted med">พระโขนง</span>
+    จังหวัด<span class="dotted long">กรุงเทพมหานคร</span>
+  </div>
+
+  <!-- (5) ภาพถ่าย -->
+  <div class="section">
+    <span class="section-num">(๕)</span> ภาพถ่ายผู้ถูกจับและควบคุมตาม (๑) (เป็นภาพแนบท้าย)
+  </div>
+
+  <!-- (6) เจ้าหน้าที่ -->
+  <div class="section">
+    <span class="section-num">(๖)</span> ชื่อ สกุล และตำแหน่งของเจ้าหน้าที่ของรัฐผู้รับผิดชอบที่ทำการจับและควบคุมตามมาตรา ๒๒<br>
+    รวมทั้งหมายเลขโทรศัพท์ที่สามารถติดต่อได้<br>
+    ยศ/ชื่อ/นามสกุล<span class="dotted xlong">ร.ต.อ. สมชาย รักษาดี</span><br>
+    ตำแหน่ง/สังกัด<span class="dotted xlong">รอง สว.(สอบสวน) สน.พระโขนง</span><br>
+    หมายเลขโทรศัพท์ที่สามารถติดต่อได้<span class="dotted long">02-311-xxxx</span>
+  </div>
+
+  <!-- (7) เหตุสุดวิสัย -->
+  <div class="section">
+    <span class="section-num">(๗)</span> เหตุสุดวิสัยในกรณีที่ไม่สามารถบันทึกภาพและเสียงได้ในขณะจับและควบคุม (ถ้ามี) <span class="dotted long">ไม่มี</span><br>
+    <span class="blank-line"></span>
+    <span class="blank-line"></span>
+  </div>
+
+  <!-- ลงชื่อ -->
+  <div class="sig-area">
+    <div>ลงชื่อ <span class="sig-line"></span>ผู้แจ้งซึ่งทำการจับและควบคุม</div>
+    <div style="margin-top:2px">(เจ้าหน้าที่ของรัฐผู้รับผิดชอบตามข้อ ๖)</div>
+  </div>
+
+  <!-- หมายเหตุ -->
+  <div class="note">
+    <strong>*****หมายเหตุ :</strong> ให้ใช้แบบแจ้งข้อมูลนี้ เฉพาะกรณีระบบรับแจ้งการควบคุมตัวเกิดข้อขัดข้อง/หรือแจ้งพนักงานอัยการเท่านั้น
+  </div>
+
+</div>
+
+<!-- =============== ATTACHMENT PAGE: PHOTOS =============== -->
+<div class="page attach-page">
+  <div class="attach-title">
+    <div class="ext">(เพิ่มเติม)</div>
+    <h2>แบบแจ้งเรื่องการควบคุมตัวตามมาตรา ๒๒ วรรคสอง</h2>
+    <div class="sub">ตามข้อ (๕) ภาพถ่ายผู้ถูกจับและการควบคุม ตามข้อ (๑) (ภาพแนบท้าย)</div>
+  </div>
+
+  <div class="photo-grid-large">
+    <div class="photo-cell"><span class="label">หน้าตรง</span>[ภาพถ่ายเต็มตัว]</div>
+    <div class="photo-cell"><span class="label">หันหลัง</span>[ภาพถ่ายเต็มตัว]</div>
+    <div class="photo-cell"><span class="label">หันข้างซ้าย</span>[ภาพถ่ายเต็มตัว]</div>
+    <div class="photo-cell"><span class="label">หันข้างขวา</span>[ภาพถ่ายเต็มตัว]</div>
+  </div>
+
+  <div class="attach-sig-row">
+    <div class="attach-sig-box">
+      ลงชื่อ ร.ต.ต. <span class="sig-line"></span><br>
+      ( <span class="d md">จิรชัยยชญ์ ศรีดวงแก้ว</span> )<br>
+      <span style="font-size:12px">รอง สว.(สส) กก.สส.บก.ตม.๓</span>
+    </div>
+    <div class="attach-sig-box">
+      ลงชื่อ <span class="sig-line"></span><br>
+      ( <span class="d md"></span> )<br>
+      ผู้ถูกควบคุม
+    </div>
+    <div class="attach-sig-box">
+      ลงชื่อ <span class="sig-line"></span><br>
+      ( <span class="d md"></span> )<br>
+      พยาน(ถ้ามี)
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

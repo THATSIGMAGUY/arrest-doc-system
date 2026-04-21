@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<title>บันทึกการจับกุม / บันทึกการตรวจค้น/จับกุม - Prototype</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600;700&display=swap');
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    font-family: 'Sarabun', 'TH SarabunPSK', sans-serif;
+    font-size: 15px;
+    line-height: 1.75;
+    color: #111;
+    background: #e0e0e0;
+  }
+  .page {
+    width: 210mm;
+    min-height: 297mm;
+    margin: 20px auto;
+    padding: 18mm 22mm 15mm 22mm;
+    background: #fff;
+    box-shadow: 0 2px 8px rgba(0,0,0,.15);
+    page-break-after: always;
+  }
+  .page:last-child { page-break-after: auto; }
+  @media print {
+    body { background: #fff; }
+    .page { margin:0; padding: 15mm 18mm 12mm 18mm; box-shadow:none; width:100%; }
+    @page { margin: 0; size: A4; }
+  }
+
+  .page-num { text-align: center; font-size: 14px; margin-bottom: 8px; }
+  h1 { font-size: 18px; font-weight: 700; text-align: center; margin-bottom: 10px; }
+
+  /* Right-aligned header fields */
+  .header-fields {
+    float: right;
+    text-align: left;
+    margin-bottom: 10px;
+    font-size: 14.5px;
+    line-height: 1.8;
+  }
+  .header-fields::after { content:''; display:block; clear:both; }
+  .clearfix::after { content:''; display:block; clear:both; }
+
+  /* Dotted fields */
+  .d {
+    border-bottom: 1px dotted #555;
+    min-width: 60px;
+    display: inline-block;
+    padding: 0 3px;
+    text-align: center;
+    color: #0000cc;
+    font-weight: 600;
+  }
+  .d:empty::after { content: '\00a0'; }
+  .d.sm { min-width: 80px; }
+  .d.md { min-width: 130px; }
+  .d.lg { min-width: 200px; }
+  .d.xl { min-width: 300px; }
+  .d.full { width: 100%; text-align: left; padding-left: 6px; }
+  .blank {
+    width: 100%;
+    border-bottom: 1px dotted #999;
+    height: 1.75em;
+    display: block;
+  }
+
+  .section { margin-bottom: 6px; }
+  .section-title { font-weight: 700; margin-bottom: 2px; }
+
+  /* Evidence list */
+  .ev-table { margin-left: 2em; }
+  .ev-table .ev-row { display: flex; gap: 4px; }
+  .ev-num { min-width: 2em; text-align: center; }
+
+  /* Signature grid */
+  .sig-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px 20px;
+    margin-top: 16px;
+  }
+  .sig-item {
+    text-align: center;
+    font-size: 14px;
+  }
+  .sig-item .rank { margin-right: 8px; }
+  .sig-line {
+    width: 200px;
+    border-bottom: 1px dotted #555;
+    display: inline-block;
+    margin-bottom: 2px;
+  }
+
+  .indent { text-indent: 3em; }
+  .indent2 { margin-left: 3em; }
+
+  .val { color: #0000cc; font-weight: 600; }
+
+  /* rights list */
+  .rights-list { margin-left: 3em; }
+  .rights-list div { text-indent: -1.5em; margin-left: 1.5em; }
+</style>
+</head>
+<body>
+
+<!-- =============== PAGE 1 =============== -->
+<div class="page">
+  <h1>บันทึกตรวจค้น/จับกุม</h1>
+
+  <div class="header-fields">
+    ลงวันที่<span class="d md">6 เมษายน พ.ศ. 2569</span><br>
+    ปจว.ข้อ<span class="d sm">1</span>เวลา<span class="d sm">14.30</span><br>
+    คดีอาญาที่<span class="d md">ลป.xxx/2569</span><br>
+    บัญชีของกลางที่<span class="d md">xxx/2569</span><br>
+    พนักงานสอบสวน<span class="d md">ร.ต.อ. สมชาย</span>
+  </div>
+  <div class="clearfix"></div>
+
+  <h1 style="font-size:17px; margin-top:6px">บันทึกการจับกุม</h1>
+
+  <div class="section">
+    สถานที่ทำการบันทึก<span class="d xl">สน.พระโขนง เขตพระโขนง กรุงเทพมหานคร</span><br>
+    วัน / เดือน / ปี ที่บันทึก&emsp;วันที่<span class="d sm">6</span>เดือน<span class="d sm">เมษายน</span>พ.ศ. <span class="d sm">2569</span> เวลา<span class="d sm">15.00</span>น.<br>
+    วัน / เดือน / ปี ที่ตรวจค้น/จับกุม&emsp;วันที่<span class="d sm">6</span>เดือน<span class="d sm">เมษายน</span>พ.ศ. <span class="d sm">2569</span> เวลา<span class="d sm">14.30</span>น.
+  </div>
+
+  <div class="section">
+    <div class="section-title">สถานที่ที่จับกุม</div>
+    บ้านเลขที่<span class="d md">-</span>ถนน<span class="d md">สุขุมวิท</span>แขวง/ตำบล<span class="d md">บางจาก</span><br>
+    เขต/อำเภอ<span class="d md">พระโขนง</span>จังหวัด<span class="d md">กรุงเทพมหานคร</span>
+  </div>
+
+  <div class="section">
+    <div class="section-title">เจ้าหน้าที่ตำรวจที่ทำการจับกุม</div>
+    ภายใต้การอำนวยการของ<span class="d xl">พ.ต.อ. ประเสริฐ มั่นคง ผกก.สน.พระโขนง</span><br>
+    นำโดย<span class="d xl">ร.ต.อ. สมชาย รักษาดี รอง สว.(สอบสวน) สน.พระโขนง</span><br>
+    <span class="blank"></span>
+  </div>
+
+  <div class="section">
+    <div class="section-title">ได้ร่วมกันจับกุมตัว</div>
+    ๑. <span class="d xl">นายทดสอบ ตัวอย่าง</span>อายุ<span class="d sm">35</span>ปี (เกิดเมื่อวันที่<span class="d sm">1</span>/<span class="d sm">1</span>/<span class="d sm">2534</span>)<br>
+    เลขประจำตัวประชาชน<span class="d lg">1-1234-56789-01-2</span>ที่อยู่ตามบัตรประชาชน เลขที่<span class="d sm">123</span>แขวง/ตำบล<span class="d sm">บางจาก</span><br>
+    เขต/อำเภอ<span class="d md">พระโขนง</span>จังหวัด<span class="d md">กรุงเทพมหานคร</span>
+  </div>
+
+  <div class="section">
+    <div class="section-title">พร้อมด้วยของกลาง</div>
+    <div class="ev-table">
+      <div class="ev-row"><span class="ev-num">๑.</span> <span class="d lg">โทรศัพท์มือถือ ยี่ห้อ iPhone</span>จำนวน<span class="d sm">1</span>ชิ้น พบที่<span class="d md">กระเป๋ากางเกงด้านขวา</span></div>
+      <div class="ev-row"><span class="ev-num">๒.</span> <span class="d lg">กระเป๋าสตางค์</span>จำนวน<span class="d sm">1</span>ชิ้น พบที่<span class="d md">กระเป๋าหลัง</span></div>
+      <div class="ev-row"><span class="ev-num">๓.</span> <span class="d lg"></span>จำนวน<span class="d sm"></span>ชิ้น พบที่<span class="d md"></span></div>
+      <div class="ev-row"><span class="ev-num">๔.</span> <span class="d lg"></span>จำนวน<span class="d sm"></span>ชิ้น พบที่<span class="d md"></span></div>
+    </div>
+    <div style="text-align:center; font-weight:700; margin-top:4px">
+      รวม<span class="d sm">2</span>รายการ จำนวน<span class="d sm">2</span>ชิ้น
+    </div>
+  </div>
+
+  <div class="section">
+    <p class="indent">โดยกล่าวหาว่า "<span class="d xl">ลักทรัพย์ ตาม ป.อาญา มาตรา 334</span>"</p>
+  </div>
+
+  <div class="section">
+    <div class="section-title" style="text-indent:3em">พฤติการณ์กล่าวคือ</div>
+    <p class="indent" style="color:#888; font-style:italic">[ส่วนพฤติการณ์นี้จะแตกต่างกันไปตามแต่กรณี — เจ้าหน้าที่กรอกรายละเอียดของแต่ละคดี เช่น ที่มาของการสืบสวน, ผู้แจ้งเหตุ, การวางแผนจับกุม, ขั้นตอนการเข้าจับ ฯลฯ]</p>
+    <span class="blank"></span>
+    <span class="blank"></span>
+    <span class="blank"></span>
+  </div>
+</div>
+
+<!-- =============== PAGE 2 =============== -->
+<div class="page">
+  <p class="indent">เจ้าหน้าที่ตำรวจชุดจับกุมได้เดินทางไปยังสถานที่ดังกล่าวข้างต้น เมื่อไปถึงได้พบ นาย/นางสาว<span class="d lg">ทดสอบ ตัวอย่าง</span></p>
+
+  <p class="indent">อยู่ในที่เกิดเหตุ เจ้าหน้าที่ตำรวจจึงได้แสดงตัวและแสดงบัตรประจำตัวให้ นาย/นางสาว<span class="d lg">ทดสอบ ตัวอย่าง</span></p>
+
+  <p>ทราบและเข้าใจดีแล้ว ผลการตรวจสอบพบของกลางตามรายการดังกล่าวข้างต้น เจ้าหน้าที่ตำรวจจึงได้แจ้งให้ นาย/นางสาว<span class="d lg">ทดสอบ ตัวอย่าง</span> ทราบว่าการกระทำดังกล่าวเป็นการกระทำความผิดต่อกฎหมาย</p>
+
+  <p>และแจ้งข้อกล่าวหาให้ทราบว่ากระทำความผิดฐาน "<span class="d xl">ลักทรัพย์</span>" และได้แจ้งสิทธิ์ของผู้ต้องหา ตาม ป.วิอาญา มาตรา ๗/๑ ให้ผู้ต้องหาทราบ ณ สถานที่ตรวจค้น/จับกุม ดังนี้</p>
+
+  <div class="rights-list" style="margin-top:6px">
+    <div>๑. มีสิทธิ์แจ้งหรือขอให้เจ้าพนักงานให้ญาติหรือผู้ซึ่งตนไว้วางใจทราบถึงการจับกุมและสถานที่ที่ถูกควบคุมในโอกาสแรกที่สามารถดำเนินการได้โดยสะดวก</div>
+    <div>๒. มีสิทธิ์ที่จะพบและปรึกษาทนายความ หรือผู้ซึ่งจะเป็นทนายความเป็นการเฉพาะตัว</div>
+    <div>๓. มีสิทธิ์ให้ทนายความหรือผู้ที่ตนไว้วางใจเข้าฟังการสอบปากคำตนได้ในชั้นสอบสวน</div>
+    <div>๔. มีสิทธิ์ได้รับการเยี่ยมหรือติดต่อกับญาติได้ตามสมควร</div>
+    <div>๕. มีสิทธิ์ได้รับการรักษาพยาบาลโดยเร็วเมื่อเกิดการเจ็บป่วย</div>
+    <div>๖. มีสิทธิ์ที่จะให้การหรือไม่ให้การก็ได้ และถ้อยคำของผู้ถูกจับนั้น อาจใช้เป็นพยานหลักฐานในการพิจารณาคดีได้</div>
+  </div>
+
+  <p style="margin-top:8px">
+    <span class="indent">ขณะจับกุม นาย/นางสาว</span><span class="d lg">ทดสอบ ตัวอย่าง</span> ผู้ถูกจับ ได้รับทราบข้อกล่าวหา และสิทธิ์ของ
+  </p>
+  <p>ผู้ถูกจับโดยเข้าใจดีตลอดแล้ว และให้การ<span class="d lg">รับสารภาพ</span></p>
+
+  <p class="indent">เจ้าหน้าที่ตำรวจชุดจับกุมจึงได้ร่วมกันทำการจับกุม พร้อมตรวจยึดของกลางตามรายการดังกล่าวข้างต้นเป็นของกลาง เสร็จสิ้นการตรวจค้นเวลาประมาณ<span class="d sm">15.00</span>น. นำส่งพนักงานสอบสวน<span class="d xl">สน.พระโขนง</span>เพื่อดำเนินคดีตามกฎหมายต่อไป</p>
+
+  <div style="margin-top:10px">
+    <div class="section-title">เหตุเกิดที่</div>
+    บ้านเลขที่<span class="d sm">-</span>แขวง/ตำบล<span class="d md">บางจาก</span>เขต/อำเภอ<span class="d md">พระโขนง</span>จังหวัด<span class="d md">กรุงเทพมหานคร</span><br>
+    <div class="section-title">เมื่อวันที่</div>
+    <span class="d md">6 เมษายน พ.ศ. 2569</span>เวลาประมาณ<span class="d sm">14.30</span>น.
+  </div>
+
+  <p class="indent" style="margin-top:10px">
+    <strong>อนึ่ง</strong> ในการจับครั้งนี้ เจ้าหน้าที่ตำรวจทุกนาย ได้ปฏิบัติตามอำนาจหน้าที่ มิได้ทำหรือจัดให้ทำการใดๆ ซึ่งเป็นการให้คำมั่น สัญญา ชู่เชิญ หลอกลวง ทรมาน ใช้กำลังบังคับ หรือทำให้ผู้ได้รับอันตรายแก่กายหรือจิตใจ แต่อย่างก็ มิได้ทำให้ทรัพย์สินของผู้ใดเสียหาย สูญหาย เสื่อมค่าหรือไร้ค่า และมิได้เบียดบังเอาทรัพย์สินของผู้ใดไปเป็นประโยชน์ส่วนตนหรือบุคคลอื่น หรือกระทำการโดยมิชอบประการใดๆ เจ้าหน้าที่ผู้จับได้จัดทำบันทึกการจับขึ้น แล้วได้มอบสำเนาบันทึกการจับให้ผู้ถูกจับไว้ จำนวน ๑ ฉบับแล้ว
+  </p>
+
+  <p class="indent" style="margin-top:6px">
+    ได้อ่านบันทึกนี้ให้ผู้ต้องหาฟังและได้อ่านเองแล้ว รับว่าถูกต้อง จึงให้ลงลายมือชื่อไว้เป็นหลักฐาน
+  </p>
+
+  <!-- Signature area -->
+  <div style="text-align:center; margin-top:20px">
+    <div>(ลงชื่อ)<span class="d lg"></span>ผู้ต้องหา/ได้รับสำเนาบันทึกการจับไว้แล้ว</div>
+    <div>(<span class="d md">นายทดสอบ ตัวอย่าง</span>)</div>
+  </div>
+
+  <div class="sig-grid" style="margin-top:18px">
+    <div class="sig-item">ร.ต.อ. <span class="sig-line"></span>ผู้จับกุม<br>(<span class="d sm"></span>)</div>
+    <div class="sig-item">ร.ต.อ. <span class="sig-line"></span>ผู้จับกุม<br>(<span class="d sm"></span>)</div>
+    <div class="sig-item">ด.ต. <span class="sig-line"></span>ผู้จับกุม<br>(<span class="d sm"></span>)</div>
+    <div class="sig-item">ด.ต. <span class="sig-line"></span>ผู้จับกุม<br>(<span class="d sm"></span>)</div>
+    <div class="sig-item">ด.ต. <span class="sig-line"></span>ผู้จับกุม<br>(<span class="d sm"></span>)</div>
+    <div class="sig-item">ส.ด.ท. <span class="sig-line"></span>ผู้จับกุม/บันทึก/อ่าน<br>(<span class="d sm"></span>)</div>
+  </div>
+</div>
+
+</body>
+</html>
