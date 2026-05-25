@@ -91,6 +91,8 @@ function rStep1() {
     <div class="st" style="margin-top:16px">เจ้าหน้าที่ชุดจับกุม</div>
     <div class="ss">แบ่ง 3 ส่วน — เพิ่มรายชื่อได้หลายนายในแต่ละส่วน</div>
 
+    ${rPresetBar()}
+
     <!-- 1. ภายใต้การอำนวยการของ -->
     <div class="card" style="border-left:4px solid var(--pri)">
       <div class="card-h">
