@@ -181,7 +181,7 @@ function buildDocHTML(type, idx) {
 
     // Suspect signatures — "(ลงชื่อ)...ผู้ต้องหา/ได้รับสำเนาบันทึกการจับไว้แล้ว"
     const suspectSigHTML = suspectSigs.map(s=>`
-      <div style="text-align:center;margin:8px 0">
+      <div style="text-align:center;margin:4px 0 2px">
         (ลงชื่อ)${S.signatures[s.key]&&S.sigMode==='electronic'?`<img src="${S.signatures[s.key]}" style="height:30px">`:'<span class="d lg"></span>'}ผู้ต้องหา/ได้รับสำเนาบันทึกการจับไว้แล้ว<br>
         (${_vmd(s.name)})
       </div>
@@ -206,7 +206,7 @@ function buildDocHTML(type, idx) {
         ${s2?`<td style="text-align:center;padding:0 0 8px">(${_vmd(s2.name)})</td>`:'<td></td>'}
       </tr>`);
     }
-    const officerSigHTML = `<table style="width:100%;border-collapse:collapse;margin-top:8px">${officerSigRows.join('')}</table>`;
+    const officerSigHTML = `<table style="width:100%;border-collapse:collapse;margin-top:2px">${officerSigRows.join('')}</table>`;
 
     const page2 = `
       <div class="page">
@@ -488,7 +488,7 @@ function getDocCSS(type) {
       h2{font-size:18px;font-weight:700;text-align:center;margin-bottom:4px}
       h3{font-size:15px;font-weight:700;margin-bottom:4px}
       strong{font-weight:700}
-      img{max-width:100%}
+      img{max-width:100%;vertical-align:middle}
 
       .stars{text-align:center;font-size:14px;letter-spacing:1px;margin-bottom:6px}
       .indent{text-indent:3em;margin-bottom:4px}
@@ -505,7 +505,7 @@ function getDocCSS(type) {
         display:inline-block;
         min-width:${dMin}; padding:0 3px;
         text-align:center;
-        color:#0000cc; font-weight:600;
+        color:#111; font-weight:600;
         font-size:${dFontSize};
       }
       .d:empty::after{content:'\\00a0'}
@@ -668,12 +668,86 @@ function exportPDF(type, idx) {
   openPrintWindow(doc.title, doc.body, type);
 }
 
+
+// === Image resize helper — Canvas-based, returns resized base64 ===
+// Word ignores CSS max-height/max-width on <img>, so we resize before embedding.
+function _resizeImg(src, maxW, maxH) {
+  return new Promise(function(resolve) {
+    if (!src) { resolve(src); return; }
+    const img = new Image();
+    img.onload = function() {
+      const ratio = Math.min(maxW / img.width, maxH / img.height, 1);
+      if (ratio >= 1) { resolve(src); return; }
+      const w = Math.round(img.width * ratio);
+      const h = Math.round(img.height * ratio);
+      const canvas = document.createElement('canvas');
+      canvas.width = w; canvas.height = h;
+      canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+      resolve(canvas.toDataURL('image/jpeg', 0.88));
+    };
+    img.onerror = function() { resolve(src); };
+    img.src = src;
+  });
+}
+
+async function _resizeSuspectsPhotos(suspects, maxW, maxH) {
+  return Promise.all(suspects.map(async function(sus) {
+    const c = Object.assign({}, sus);
+    if (c.photo)       c.photo       = await _resizeImg(c.photo,       maxW, maxH);
+    if (c.photoFront)  c.photoFront  = await _resizeImg(c.photoFront,  maxW, maxH);
+    if (c.photoBack)   c.photoBack   = await _resizeImg(c.photoBack,   maxW, maxH);
+    if (c.photoLeft)   c.photoLeft   = await _resizeImg(c.photoLeft,   maxW, maxH);
+    if (c.photoRight)  c.photoRight  = await _resizeImg(c.photoRight,  maxW, maxH);
+    return c;
+  }));
+}
+
 // === Word (.doc) export ===
-// Generates an HTML file with Word XML headers, downloaded with .doc extension.
-// Microsoft Word opens these natively, preserving most styling and pagination.
-function exportDoc(type, idx) {
-  const doc = buildDocHTML(type, idx);
-  downloadDoc(doc.title, doc.body, type);
+// Photos are pre-resized via Canvas — Word ignores CSS max-height on <img>.
+async function exportDoc(type, idx) {
+  const maxW = 310;
+  const maxH = (type === 'sec23') ? 249 : 340;
+  const orig = S.suspects;
+  S.suspects = await _resizeSuspectsPhotos(orig, maxW, maxH);
+  try {
+    const doc = buildDocHTML(type, idx);
+    downloadDoc(doc.title, doc.body, type);
+  } finally {
+    S.suspects = orig;
+  }
+}
+
+// exportAllDoc also pre-resizes for sec22/sec23 attachments
+async function exportAllDoc() {
+  const maxW = 310;
+  const orig = S.suspects;
+  let delay = 0;
+  const gap = 800;
+
+  // arrest doc has no photos — download directly
+  setTimeout(function() {
+    const d = buildDocHTML('arrest', 0);
+    downloadDoc(d.title, d.body, 'arrest');
+  }, delay);
+  delay += gap;
+
+  // sec22 & sec23 need photo resize
+  S.suspects.forEach(function(s, i) {
+    setTimeout(async function() {
+      S.suspects = await _resizeSuspectsPhotos(orig, maxW, 340);
+      const d = buildDocHTML('sec22', i);
+      S.suspects = orig;
+      downloadDoc(d.title, d.body, 'sec22');
+    }, delay);
+    delay += gap;
+    setTimeout(async function() {
+      S.suspects = await _resizeSuspectsPhotos(orig, maxW, 249);
+      const d = buildDocHTML('sec23', i);
+      S.suspects = orig;
+      downloadDoc(d.title, d.body, 'sec23');
+    }, delay);
+    delay += gap;
+  });
 }
 
 function downloadDoc(title, body, docType) {

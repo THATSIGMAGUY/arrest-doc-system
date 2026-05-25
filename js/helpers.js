@@ -81,11 +81,12 @@ function initSig() {
   if(S.signatures[key]){const img=new Image();img.onload=()=>sigCx.drawImage(img,0,0);img.src=S.signatures[key];}
   sigCv.onmousedown=e=>{sigD=true;sigCx.beginPath();sigCx.moveTo(e.offsetX,e.offsetY);sigCx.strokeStyle='#111';sigCx.lineWidth=2;sigCx.lineCap='round';};
   sigCv.onmousemove=e=>{if(!sigD)return;sigCx.lineTo(e.offsetX,e.offsetY);sigCx.stroke();};
-  sigCv.onmouseup=()=>{sigD=false;S.signatures[S.sigActiveKey]=sigCv.toDataURL();};
+  sigCv.onmouseup=()=>{sigD=false;S.signatures[S.sigActiveKey]=cropSig(sigCv);};
   sigCv.ontouchstart=e=>{e.preventDefault();const r=sigCv.getBoundingClientRect();const p={offsetX:e.touches[0].clientX-r.left,offsetY:e.touches[0].clientY-r.top};sigD=true;sigCx.beginPath();sigCx.moveTo(p.offsetX,p.offsetY);sigCx.strokeStyle='#111';sigCx.lineWidth=2;sigCx.lineCap='round';};
   sigCv.ontouchmove=e=>{e.preventDefault();if(!sigD)return;const r=sigCv.getBoundingClientRect();sigCx.lineTo(e.touches[0].clientX-r.left,e.touches[0].clientY-r.top);sigCx.stroke();};
-  sigCv.ontouchend=()=>{sigD=false;S.signatures[S.sigActiveKey]=sigCv.toDataURL();};
+  sigCv.ontouchend=()=>{sigD=false;S.signatures[S.sigActiveKey]=cropSig(sigCv);};
 }
+function cropSig(cv){try{const ctx=cv.getContext('2d');const w=cv.width,h=cv.height;if(!w||!h)return cv.toDataURL();const d=ctx.getImageData(0,0,w,h).data;let minX=w,minY=h,maxX=0,maxY=0,found=false;for(let y=0;y<h;y++){for(let x=0;x<w;x++){if(d[(y*w+x)*4+3]>10){found=true;if(x<minX)minX=x;if(x>maxX)maxX=x;if(y<minY)minY=y;if(y>maxY)maxY=y;}}}if(!found)return cv.toDataURL();const pad=6;minX=Math.max(0,minX-pad);minY=Math.max(0,minY-pad);maxX=Math.min(w-1,maxX+pad);maxY=Math.min(h-1,maxY+pad);const cw=maxX-minX+1,ch=maxY-minY+1;const o=document.createElement('canvas');o.width=cw;o.height=ch;o.getContext('2d').drawImage(cv,minX,minY,cw,ch,0,0,cw,ch);return o.toDataURL();}catch(e){return cv.toDataURL();}}
 function clearSig() { delete S.signatures[S.sigActiveKey]; R(); }
 
 // Preview & Export

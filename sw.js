@@ -1,4 +1,4 @@
-const CACHE_NAME = 'arrest-doc-v1';
+const CACHE_NAME = 'arrest-doc-v2';
 const STATIC_ASSETS = [
   './',
   './index.html',
