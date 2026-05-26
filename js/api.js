@@ -130,18 +130,25 @@ async function openCase(caseId) {
     return;
   }
 
+  // Guard: ถ้า session หาย ให้ redirect ไป login แทนที่จะส่ง requester ว่าง
+  const requester = S.currentUser?.username;
+  if (!requester) {
+    showToast('Session หมดอายุ กรุณา login ใหม่', 'error');
+    doLogout();
+    return;
+  }
+
   S.loading = true; R();
   try {
-    // Day 4: getCase ต้องส่ง requester + backend return shape ใหม่เป็น flat (caseData อยู่ top-level)
-    const data = await gasPost('getCase', {
-      caseId,
-      requester: S.currentUser?.username || ''
-    });
+    const data = await gasPost('getCase', { caseId, requester });
     if (data.success && data.caseData) {
       const cd = typeof data.caseData === 'string' ? JSON.parse(data.caseData) : data.caseData;
       Object.assign(S, cd);
       S.currentCaseId = caseId;
       S.view = 'form';
+    } else if (data.error === 'SESSION_EXPIRED') {
+      showToast('Session หมดอายุ กรุณา login ใหม่', 'error');
+      doLogout();
     } else {
       showToast(data.error || 'โหลดข้อมูลคดีล้มเหลว', 'error');
     }
@@ -162,12 +169,11 @@ async function confirmDeleteCase(caseId) {
     return;
   }
 
+  const requesterDel = S.currentUser?.username;
+  if (!requesterDel) { showToast('Session หมดอายุ กรุณา login ใหม่', 'error'); doLogout(); return; }
+
   try {
-    // Day 4: deleteCase ต้องส่ง requester (backend เช็คว่าเป็นเจ้าของหรือ admin)
-    const data = await gasPost('deleteCase', {
-      caseId,
-      requester: S.currentUser?.username || ''
-    });
+    const data = await gasPost('deleteCase', { caseId, requester: requesterDel });
     if (data.success) {
       showToast('🗑 ลบสำเร็จ', 'success');
       await loadCases();
