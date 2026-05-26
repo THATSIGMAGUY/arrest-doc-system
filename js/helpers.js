@@ -1,5 +1,5 @@
 // ========== HELPERS ==========
-function esc(s) { return (s||'').replace(/"/g,'&quot;').replace(/</g,'&lt;'); }
+function esc(s) { return String(s||'').replace(/"/g,'&quot;').replace(/</g,'&lt;'); }
 function thDate(d) { if(!d) return ''; const x=new Date(d); const m=['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.']; return `${x.getDate()} ${m[x.getMonth()]} ${x.getFullYear()+543}`; }
 function getOT(s) { const m={caught_in_act:'ความผิดซึ่งหน้า',warrant:`หมายจับ ${s.s23_warrantNo||'...'}`,order:`คำสั่ง ${s.s23_orderDetail||'...'}`,other:s.s23_otherDetail||'อื่นๆ'}; return m[s.s23_orderType]||'—'; }
 
